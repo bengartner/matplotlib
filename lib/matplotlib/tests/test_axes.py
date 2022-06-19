@@ -4545,6 +4545,31 @@ def test_vlines_default():
         assert mpl.colors.same_color(lines.get_color(), 'red')
 
 
+@check_figures_equal()
+def test_vlines_blended_transform(fig_test, fig_ref):
+    t = np.arange(5.0, 10.0, 0.1)
+    s = np.exp(-t) + np.sin(2 * np.pi * t) + 10
+
+    ax = fig_test.add_subplot()
+    ax.plot(t, s, '^')
+
+    # By using ``transform=vax.get_xaxis_transform()`` the y coordinates are
+    # scaled such that 0 maps to the bottom of the axes and 1 to the top.
+    ax.vlines([6, 7], ymin=0, ymax=.15, transform=ax.get_xaxis_transform(),
+              colors='r')
+    ax.set_title('Vertical lines demo')
+    ax.set_xlabel('time (s)')
+
+    ax = fig_ref.add_subplot()
+    ax.plot(t, s, '^')
+
+    # if I use axvline() instead, it correctly treats ymin as axes coordinate.
+    ax.axvline(6, ymin=0, ymax=0.15, c='r')
+    ax.axvline(7, ymin=0, ymax=0.15, c='r')
+    ax.set_title('Vertical lines demo')
+    ax.set_xlabel('time (s)')
+
+
 @image_comparison(['hlines_basic', 'hlines_with_nan', 'hlines_masked'],
                   extensions=['png'])
 def test_hlines():
